@@ -7,17 +7,17 @@ export function ReagentTable({ reagents, onRefetch }: { reagents: Reagent[]; onR
   const [confirm, setConfirm] = useState<{ action: 'delete' | 'deplete' | 'restore'; id: string } | null>(null)
 
   const handleDeplete = async (id: string, is_depleted: boolean) => {
-    await fetch(`/api/reagents/${id}`, {
+    const res = await fetch(`/api/reagents/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_depleted }),
     })
-    onRefetch()
+    if (res.ok) onRefetch()
   }
 
   const handleDelete = async (id: string) => {
-    await fetch(`/api/reagents/${id}`, { method: 'DELETE' })
-    onRefetch()
+    const res = await fetch(`/api/reagents/${id}`, { method: 'DELETE' })
+    if (res.ok) onRefetch()
   }
 
   return (

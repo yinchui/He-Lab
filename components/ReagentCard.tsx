@@ -7,17 +7,17 @@ export function ReagentCard({ reagent, onRefetch }: { reagent: Reagent; onRefetc
   const [confirm, setConfirm] = useState<{ action: 'delete' | 'deplete' | 'restore' } | null>(null)
 
   const handleDeplete = async (is_depleted: boolean) => {
-    await fetch(`/api/reagents/${reagent.id}`, {
+    const res = await fetch(`/api/reagents/${reagent.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_depleted }),
     })
-    onRefetch()
+    if (res.ok) onRefetch()
   }
 
   const handleDelete = async () => {
-    await fetch(`/api/reagents/${reagent.id}`, { method: 'DELETE' })
-    onRefetch()
+    const res = await fetch(`/api/reagents/${reagent.id}`, { method: 'DELETE' })
+    if (res.ok) onRefetch()
   }
 
   const r = reagent
