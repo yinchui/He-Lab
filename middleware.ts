@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const STATIC_EXTENSIONS = /\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|ttf|otf|map)$/
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 放行登录页和认证 API，避免死循环
-  if (pathname.startsWith('/login') || pathname.startsWith('/api/auth')) {
+  // 放行登录页、认证 API 和静态资源，避免死循环和资源加载失败
+  if (
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/api/auth') ||
+    STATIC_EXTENSIONS.test(pathname)
+  ) {
     return NextResponse.next()
   }
 
