@@ -32,10 +32,10 @@ function LoginForm() {
         router.push(getSafeRedirect(searchParams.get('from')))
       } else {
         setError('密码错误，请重试')
-        setLoading(false)
       }
     } catch {
       setError('网络错误，请重试')
+    } finally {
       setLoading(false)
     }
   }
