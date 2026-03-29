@@ -19,4 +19,4 @@ export interface Reagent {
 
 export type ReagentInsert = Omit<Reagent, 'id' | 'created_at' | 'updated_at'>
 
-export const CATEGORIES: Category[] = ['抑制剂', '抗体', 'siRNA', '质粒']
+export const CATEGORIES = ['抑制剂', '抗体', 'siRNA', '质粒'] as const satisfies readonly Category[]
