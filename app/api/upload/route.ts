@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { v2 as cloudinary } from 'cloudinary'
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+import cloudinary from '@/lib/cloudinary'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
@@ -21,16 +15,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '文件大小不能超过 10MB' }, { status: 400 })
 
   const buffer = Buffer.from(await file.arrayBuffer())
-  const result = await new Promise<{ secure_url: string; public_id: string }>(
-    (resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream({ folder: 'helab-reagents' }, (err, result) => {
-          if (err || !result) return reject(err)
-          resolve({ secure_url: result.secure_url, public_id: result.public_id })
-        })
-        .end(buffer)
-    }
-  )
-
-  return NextResponse.json(result)
+  try {
+    const result = await new Promise<{ secure_url: string; public_id: string }>(
+      (resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: 'helab-reagents' }, (err, result) => {
+            if (err || !result) return reject(err ?? new Error('Upload failed'))
+            resolve({ secure_url: result.secure_url, public_id: result.public_id })
+          })
+          .end(buffer)
+      }
+    )
+    return NextResponse.json(result)
+  } catch (e) {
+    console.error('Cloudinary upload error:', e)
+    return NextResponse.json({ error: '图片上传失败，请稍后重试' }, { status: 500 })
+  }
 }

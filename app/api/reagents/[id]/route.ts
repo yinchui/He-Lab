@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-server'
-import { v2 as cloudinary } from 'cloudinary'
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+import cloudinary from '@/lib/cloudinary'
 
 export async function PATCH(
   req: NextRequest,
@@ -14,6 +8,11 @@ export async function PATCH(
 ) {
   const supabase = createAdminClient()
   const body = await req.json()
+
+  if (typeof body.is_depleted !== 'boolean') {
+    return NextResponse.json({ error: 'is_depleted 必须为布尔值' }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from('reagents')
     .update({ is_depleted: body.is_depleted })
