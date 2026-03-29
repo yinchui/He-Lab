@@ -36,11 +36,9 @@ export async function DELETE(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   if (reagent?.cloudinary_public_id) {
-    try {
-      await cloudinary.uploader.destroy(reagent.cloudinary_public_id)
-    } catch (e) {
+    void cloudinary.uploader.destroy(reagent.cloudinary_public_id).catch((e) =>
       console.error('Cloudinary delete failed:', e)
-    }
+    )
   }
   return NextResponse.json({ success: true })
 }
