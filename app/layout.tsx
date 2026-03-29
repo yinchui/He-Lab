@@ -16,6 +16,10 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "He Lab 试剂库",
   description: "实验室试剂登记与管理系统",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
