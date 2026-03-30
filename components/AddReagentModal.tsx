@@ -19,6 +19,15 @@ const EMPTY_FORM = {
   image_url: null as string | null,
   cloudinary_public_id: null as string | null,
   is_depleted: false,
+  // siRNA 专属
+  sirna_sense_seq: null as string | null,
+  sirna_antisense_seq: null as string | null,
+  sirna_tube_count: null as string | null,
+  // 质粒专属
+  plasmid_vector_info: null as string | null,
+  plasmid_resistance: null as string | null,
+  plasmid_is_mutant: null as string | null,
+  plasmid_mutation_info: null as string | null,
 }
 
 export function AddReagentModal({ onClose, onSuccess }: Props) {
