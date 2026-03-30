@@ -120,6 +120,7 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
                 <button type="button" key={cat}
                   onClick={() => setForm((f) => ({
                     ...EMPTY_FORM,
+                    name: f.name,
                     storage_location: f.storage_location,
                     added_by: f.added_by,
                     added_date: f.added_date,
