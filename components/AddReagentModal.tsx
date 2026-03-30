@@ -20,14 +20,14 @@ const EMPTY_FORM = {
   cloudinary_public_id: null as string | null,
   is_depleted: false,
   // siRNA 专属
-  sirna_sense_seq: null as string | null,
-  sirna_antisense_seq: null as string | null,
-  sirna_tube_count: null as string | null,
+  sirna_sense_seq: '',
+  sirna_antisense_seq: '',
+  sirna_tube_count: '',
   // 质粒专属
-  plasmid_vector_info: null as string | null,
-  plasmid_resistance: null as string | null,
-  plasmid_is_mutant: null as string | null,
-  plasmid_mutation_info: null as string | null,
+  plasmid_vector_info: '',
+  plasmid_resistance: '',
+  plasmid_is_mutant: '',
+  plasmid_mutation_info: '',
 }
 
 export function AddReagentModal({ onClose, onSuccess }: Props) {
@@ -70,6 +70,13 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
         concentration_volume: form.concentration_volume || null,
         storage_location: form.storage_location || null,
         added_by: form.added_by || null,
+        sirna_sense_seq: form.sirna_sense_seq || null,
+        sirna_antisense_seq: form.sirna_antisense_seq || null,
+        sirna_tube_count: form.sirna_tube_count || null,
+        plasmid_vector_info: form.plasmid_vector_info || null,
+        plasmid_resistance: form.plasmid_resistance || null,
+        plasmid_is_mutant: form.plasmid_is_mutant || null,
+        plasmid_mutation_info: form.plasmid_mutation_info || null,
       }
       const res = await fetch('/api/reagents', {
         method: 'POST',
@@ -122,10 +129,50 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
               ))}
             </div>
           </div>
-          {field('试剂名称 *', 'name')}
-          {field('货号', 'catalog_number')}
-          {field('品牌', 'brand')}
-          {field('浓度或体积', 'concentration_volume')}
+          {/* 名称字段 */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">
+              {form.category === 'siRNA' ? 'siRNA 名称' : form.category === '质粒' ? '质粒名称' : '试剂名称'} *
+            </label>
+            <input
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="必填"
+            />
+          </div>
+
+          {/* siRNA 专属 */}
+          {form.category === 'siRNA' && (
+            <>
+              {field('正向序列', 'sirna_sense_seq')}
+              {field('互补序列', 'sirna_antisense_seq')}
+              {field('管数', 'sirna_tube_count')}
+              {field('浓度或OD值', 'concentration_volume')}
+            </>
+          )}
+
+          {/* 质粒专属 */}
+          {form.category === '质粒' && (
+            <>
+              {field('载体信息', 'plasmid_vector_info')}
+              {field('抗性', 'plasmid_resistance')}
+              {field('浓度', 'concentration_volume')}
+              {field('是否突变', 'plasmid_is_mutant')}
+              {field('突变序列信息', 'plasmid_mutation_info')}
+            </>
+          )}
+
+          {/* 通用字段（抑制剂/抗体/试剂盒/探针）*/}
+          {!['siRNA', '质粒'].includes(form.category) && (
+            <>
+              {field('货号', 'catalog_number')}
+              {field('品牌', 'brand')}
+              {field('浓度/体积', 'concentration_volume')}
+            </>
+          )}
+
+          {/* 所有分类共用 */}
           {field('存储位置', 'storage_location')}
           {field('入库人', 'added_by')}
           {field('入库日期', 'added_date', 'date')}
