@@ -1,14 +1,13 @@
 'use client'
 import { useState } from 'react'
-import { Reagent } from '@/lib/types'
+import { Reagent, Category } from '@/lib/types'
 import { ConfirmDialog } from './ConfirmDialog'
 
-export function ReagentTable({ reagents, onRefetch, category }: { reagents: Reagent[]; onRefetch: () => void; category: string | null }) {
+export function ReagentTable({ reagents, onRefetch, category }: { reagents: Reagent[]; onRefetch: () => void; category: Category | null }) {
   const [confirm, setConfirm] = useState<{ action: 'delete' | 'deplete' | 'restore'; id: string } | null>(null)
 
-  const activeCategory = category ?? ''
-  const isSiRNA = activeCategory === 'siRNA'
-  const isPlasmid = activeCategory === '质粒'
+  const isSiRNA = category === 'siRNA'
+  const isPlasmid = category === '质粒'
 
   const headers = isSiRNA
     ? ['siRNA名称', '正向序列', '互补序列', '管数', '浓度或OD值', '存储位置', '入库人', '日期', '图片', '状态', '操作']
