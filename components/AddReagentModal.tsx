@@ -118,7 +118,15 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
             <div className="flex gap-2 flex-wrap">
               {CATEGORIES.map((cat) => (
                 <button type="button" key={cat}
-                  onClick={() => setForm((f) => ({ ...f, category: cat }))}
+                  onClick={() => setForm((f) => ({
+                    ...EMPTY_FORM,
+                    storage_location: f.storage_location,
+                    added_by: f.added_by,
+                    added_date: f.added_date,
+                    image_url: f.image_url,
+                    cloudinary_public_id: f.cloudinary_public_id,
+                    category: cat,
+                  }))}
                   className={`px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
                     form.category === cat
                       ? 'bg-blue-700 text-white border-blue-700'
