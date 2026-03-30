@@ -7,12 +7,13 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
+/* 强制浅色模式，避免深色模式下文字变灰 */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   color: var(--foreground);
@@ -24,4 +25,10 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* 修复 iOS Safari 输入框文字颜色 */
+input, textarea, select {
+  -webkit-text-fill-color: inherit;
+  color: inherit;
 }
