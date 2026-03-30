@@ -52,7 +52,7 @@ export default function Home() {
           <>
             {/* Desktop table */}
             <div className="hidden md:block">
-              <ReagentTable reagents={reagents} onRefetch={refetch} />
+              <ReagentTable reagents={reagents} onRefetch={refetch} category={category} />
             </div>
             {/* Mobile cards */}
             <div className="md:hidden space-y-3">
