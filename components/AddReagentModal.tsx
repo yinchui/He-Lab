@@ -165,7 +165,18 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
           {form.category === '质粒' && (
             <>
               {field('载体信息', 'plasmid_vector_info')}
-              {field('抗性', 'plasmid_resistance')}
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">抗性</label>
+                <select
+                  value={form.plasmid_resistance}
+                  onChange={(e) => setForm((f) => ({ ...f, plasmid_resistance: e.target.value }))}
+                  className="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                >
+                  <option value="">请选择</option>
+                  <option value="A+">A+</option>
+                  <option value="K+">K+</option>
+                </select>
+              </div>
               {field('浓度', 'concentration_volume')}
               {field('是否突变', 'plasmid_is_mutant')}
               {field('突变序列信息', 'plasmid_mutation_info')}
