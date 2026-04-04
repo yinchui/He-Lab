@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback } from 'react'
-import { Category } from '@/lib/types'
+import { Category, Reagent } from '@/lib/types'
 import { useReagents } from '@/hooks/useReagents'
 import { CategoryTabs } from '@/components/CategoryTabs'
 import { SearchBar } from '@/components/SearchBar'
@@ -13,6 +13,7 @@ export default function Home() {
   const [category, setCategory] = useState<Category | null>(null)
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
+  const [editingReagent, setEditingReagent] = useState<Reagent | null>(null)
   const { reagents, loading, error, refetch } = useReagents(category, search)
   const handleSearch = useCallback((v: string) => setSearch(v), [])
 
@@ -52,7 +53,7 @@ export default function Home() {
           <>
             {/* Desktop table */}
             <div className="hidden md:block">
-              <ReagentTable reagents={reagents} onRefetch={refetch} category={category} />
+              <ReagentTable reagents={reagents} onRefetch={refetch} category={category} onEdit={setEditingReagent} />
             </div>
             {/* Mobile cards */}
             <div className="md:hidden space-y-3">
@@ -71,6 +72,19 @@ export default function Home() {
           mode="add"
           onClose={() => setShowAdd(false)}
           onSuccess={refetch}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {editingReagent && (
+        <AddReagentModal
+          mode="edit"
+          reagent={editingReagent}
+          onClose={() => setEditingReagent(null)}
+          onSuccess={() => {
+            setEditingReagent(null)
+            refetch()
+          }}
         />
       )}
     </div>

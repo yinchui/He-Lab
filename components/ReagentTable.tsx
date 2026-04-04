@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Reagent, Category } from '@/lib/types'
 import { ConfirmDialog } from './ConfirmDialog'
 
-export function ReagentTable({ reagents, onRefetch, category }: { reagents: Reagent[]; onRefetch: () => void; category: Category | null }) {
+export function ReagentTable({ reagents, onRefetch, category, onEdit }: { reagents: Reagent[]; onRefetch: () => void; category: Category | null; onEdit: (reagent: Reagent) => void }) {
   const [confirm, setConfirm] = useState<{ action: 'delete' | 'deplete' | 'restore'; id: string } | null>(null)
 
   const isSiRNA = category === 'siRNA'
@@ -89,6 +89,12 @@ export function ReagentTable({ reagents, onRefetch, category }: { reagents: Reag
                 </td>
                 <td className="px-3 py-2">
                   <div className="flex gap-1">
+                    <button
+                      onClick={() => onEdit(r)}
+                      className="px-2 py-1 text-xs border border-blue-200 text-blue-700 rounded hover:bg-blue-50"
+                    >
+                      编辑
+                    </button>
                     {r.is_depleted
                       ? <button onClick={() => setConfirm({ action: 'restore', id: r.id })} className="px-2 py-1 text-xs border border-blue-200 text-blue-700 rounded hover:bg-blue-50">恢复</button>
                       : <button onClick={() => setConfirm({ action: 'deplete', id: r.id })} className="px-2 py-1 text-xs border border-orange-200 text-orange-600 rounded hover:bg-orange-50">用完</button>}
