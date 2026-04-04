@@ -116,13 +116,17 @@ export function AddReagentModal({ onClose, onSuccess, mode, reagent }: Props) {
       } else {
         // 添加模式
         const payload: ReagentInsert = {
-          ...form,
+          category: form.category,
           name: form.name.trim(),
           catalog_number: form.catalog_number || null,
           brand: form.brand || null,
           concentration_volume: form.concentration_volume || null,
           storage_location: form.storage_location || null,
           added_by: form.added_by || null,
+          added_date: form.added_date,
+          image_url: form.image_url,
+          cloudinary_public_id: form.cloudinary_public_id,
+          is_depleted: false,
           sirna_sense_seq: form.sirna_sense_seq || null,
           sirna_antisense_seq: form.sirna_antisense_seq || null,
           sirna_tube_count: form.sirna_tube_count || null,
