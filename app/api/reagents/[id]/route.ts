@@ -77,6 +77,10 @@ export async function PUT(
       )
     }
   } else if (body.image_action === 'replace') {
+    // 验证新图片信息
+    if (!body.image_url || !body.cloudinary_public_id) {
+      return NextResponse.json({ error: '替换图片时必须提供新图片信息' }, { status: 400 })
+    }
     // 替换图片
     imageUpdate = {
       image_url: body.image_url,
