@@ -59,7 +59,7 @@ export default function Home() {
             <div className="md:hidden space-y-3">
               {reagents.length === 0
                 ? <p className="text-center text-slate-400 py-12">暂无试剂记录</p>
-                : reagents.map((r) => <ReagentCard key={r.id} reagent={r} onRefetch={refetch} />)
+                : reagents.map((r) => <ReagentCard key={r.id} reagent={r} onRefetch={refetch} onEdit={setEditingReagent} />)
               }
             </div>
           </>

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Reagent } from '@/lib/types'
 import { ConfirmDialog } from './ConfirmDialog'
 
-export function ReagentCard({ reagent, onRefetch }: { reagent: Reagent; onRefetch: () => void }) {
+export function ReagentCard({ reagent, onRefetch, onEdit }: { reagent: Reagent; onRefetch: () => void; onEdit: (reagent: Reagent) => void }) {
   const [confirm, setConfirm] = useState<{ action: 'delete' | 'deplete' | 'restore' } | null>(null)
 
   const handleDeplete = async (is_depleted: boolean) => {
@@ -50,6 +50,12 @@ export function ReagentCard({ reagent, onRefetch }: { reagent: Reagent; onRefetc
             <p>入库日期：{r.added_date}</p>
           </div>
           <div className="flex gap-2 mt-3">
+            <button
+              onClick={() => onEdit(r)}
+              className="px-3 py-1 text-xs border border-blue-200 text-blue-700 rounded-full hover:bg-blue-50"
+            >
+              编辑
+            </button>
             {r.is_depleted
               ? <button onClick={() => setConfirm({ action: 'restore' })} className="px-3 py-1 text-xs border border-blue-200 text-blue-700 rounded-full hover:bg-blue-50">恢复在库</button>
               : <button onClick={() => setConfirm({ action: 'deplete' })} className="px-3 py-1 text-xs border border-orange-200 text-orange-600 rounded-full hover:bg-orange-50">标记用完</button>}
