@@ -16,6 +16,9 @@ export default function Home() {
   const [editingReagent, setEditingReagent] = useState<Reagent | null>(null)
   const { reagents, loading, error, refetch } = useReagents(category, search)
   const handleSearch = useCallback((v: string) => setSearch(v), [])
+  const handleEdit = useCallback((reagent: Reagent) => {
+    setEditingReagent(reagent)
+  }, [])
 
   return (
     <div className="bg-white shadow-sm">
@@ -53,38 +56,29 @@ export default function Home() {
           <>
             {/* Desktop table */}
             <div className="hidden md:block">
-              <ReagentTable reagents={reagents} onRefetch={refetch} category={category} onEdit={setEditingReagent} />
+              <ReagentTable reagents={reagents} onRefetch={refetch} category={category} onEdit={handleEdit} />
             </div>
             {/* Mobile cards */}
             <div className="md:hidden space-y-3">
               {reagents.length === 0
                 ? <p className="text-center text-slate-400 py-12">暂无试剂记录</p>
-                : reagents.map((r) => <ReagentCard key={r.id} reagent={r} onRefetch={refetch} onEdit={setEditingReagent} />)
+                : reagents.map((r) => <ReagentCard key={r.id} reagent={r} onRefetch={refetch} onEdit={handleEdit} />)
               }
             </div>
           </>
         )}
       </div>
 
-      {/* Add Modal */}
-      {showAdd && (
+      {/* Add/Edit Modal */}
+      {(showAdd || editingReagent) && (
         <AddReagentModal
-          mode="add"
-          onClose={() => setShowAdd(false)}
-          onSuccess={refetch}
-        />
-      )}
-
-      {/* Edit Modal */}
-      {editingReagent && (
-        <AddReagentModal
-          mode="edit"
-          reagent={editingReagent}
-          onClose={() => setEditingReagent(null)}
-          onSuccess={() => {
+          mode={editingReagent ? 'edit' : 'add'}
+          reagent={editingReagent || undefined}
+          onClose={() => {
+            setShowAdd(false)
             setEditingReagent(null)
-            refetch()
           }}
+          onSuccess={refetch}
         />
       )}
     </div>
