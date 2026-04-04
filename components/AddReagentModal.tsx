@@ -88,6 +88,9 @@ export function AddReagentModal({ onClose, onSuccess, mode, reagent }: Props) {
     try {
       if (mode === 'edit') {
         // 编辑模式
+        if (!reagent?.id) {
+          throw new Error('缺少试剂 ID')
+        }
         const payload = {
           name: form.name.trim(),
           catalog_number: form.catalog_number || null,
@@ -107,7 +110,7 @@ export function AddReagentModal({ onClose, onSuccess, mode, reagent }: Props) {
           image_url: imageAction === 'replace' ? form.image_url : undefined,
           cloudinary_public_id: imageAction === 'replace' ? form.cloudinary_public_id : undefined,
         }
-        const res = await fetch(`/api/reagents/${reagent!.id}`, {
+        const res = await fetch(`/api/reagents/${reagent.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
