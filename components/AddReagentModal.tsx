@@ -1,10 +1,12 @@
 'use client'
 import { useState, useRef } from 'react'
-import { CATEGORIES, Category, ReagentInsert } from '@/lib/types'
+import { CATEGORIES, Category, ReagentInsert, Reagent } from '@/lib/types'
 
 interface Props {
   onClose: () => void
   onSuccess: () => void
+  mode: 'add' | 'edit'
+  reagent?: Reagent
 }
 
 const EMPTY_FORM = {
@@ -30,11 +32,33 @@ const EMPTY_FORM = {
   plasmid_mutation_info: '',
 }
 
-export function AddReagentModal({ onClose, onSuccess }: Props) {
-  const [form, setForm] = useState(EMPTY_FORM)
+export function AddReagentModal({ onClose, onSuccess, mode, reagent }: Props) {
+  const initialForm = mode === 'edit' && reagent ? {
+    category: reagent.category,
+    name: reagent.name,
+    catalog_number: reagent.catalog_number || '',
+    brand: reagent.brand || '',
+    concentration_volume: reagent.concentration_volume || '',
+    storage_location: reagent.storage_location || '',
+    added_by: reagent.added_by || '',
+    added_date: reagent.added_date,
+    image_url: reagent.image_url,
+    cloudinary_public_id: reagent.cloudinary_public_id,
+    is_depleted: reagent.is_depleted,
+    sirna_sense_seq: reagent.sirna_sense_seq || '',
+    sirna_antisense_seq: reagent.sirna_antisense_seq || '',
+    sirna_tube_count: reagent.sirna_tube_count || '',
+    plasmid_vector_info: reagent.plasmid_vector_info || '',
+    plasmid_resistance: reagent.plasmid_resistance || '',
+    plasmid_is_mutant: reagent.plasmid_is_mutant || '',
+    plasmid_mutation_info: reagent.plasmid_mutation_info || '',
+  } : EMPTY_FORM
+
+  const [form, setForm] = useState(initialForm)
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [imageAction, setImageAction] = useState<'keep' | 'replace' | 'delete'>('keep')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,28 +86,58 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
     setSubmitting(true)
     setError(null)
     try {
-      const payload: ReagentInsert = {
-        ...form,
-        name: form.name.trim(),
-        catalog_number: form.catalog_number || null,
-        brand: form.brand || null,
-        concentration_volume: form.concentration_volume || null,
-        storage_location: form.storage_location || null,
-        added_by: form.added_by || null,
-        sirna_sense_seq: form.sirna_sense_seq || null,
-        sirna_antisense_seq: form.sirna_antisense_seq || null,
-        sirna_tube_count: form.sirna_tube_count || null,
-        plasmid_vector_info: form.plasmid_vector_info || null,
-        plasmid_resistance: form.plasmid_resistance || null,
-        plasmid_is_mutant: form.plasmid_is_mutant || null,
-        plasmid_mutation_info: form.plasmid_mutation_info || null,
+      if (mode === 'edit') {
+        // 编辑模式
+        const payload = {
+          name: form.name.trim(),
+          catalog_number: form.catalog_number || null,
+          brand: form.brand || null,
+          concentration_volume: form.concentration_volume || null,
+          storage_location: form.storage_location || null,
+          added_by: form.added_by || null,
+          added_date: form.added_date,
+          sirna_sense_seq: form.sirna_sense_seq || null,
+          sirna_antisense_seq: form.sirna_antisense_seq || null,
+          sirna_tube_count: form.sirna_tube_count || null,
+          plasmid_vector_info: form.plasmid_vector_info || null,
+          plasmid_resistance: form.plasmid_resistance || null,
+          plasmid_is_mutant: form.plasmid_is_mutant || null,
+          plasmid_mutation_info: form.plasmid_mutation_info || null,
+          image_action: imageAction,
+          image_url: imageAction === 'replace' ? form.image_url : undefined,
+          cloudinary_public_id: imageAction === 'replace' ? form.cloudinary_public_id : undefined,
+        }
+        const res = await fetch(`/api/reagents/${reagent!.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
+      } else {
+        // 添加模式
+        const payload: ReagentInsert = {
+          ...form,
+          name: form.name.trim(),
+          catalog_number: form.catalog_number || null,
+          brand: form.brand || null,
+          concentration_volume: form.concentration_volume || null,
+          storage_location: form.storage_location || null,
+          added_by: form.added_by || null,
+          sirna_sense_seq: form.sirna_sense_seq || null,
+          sirna_antisense_seq: form.sirna_antisense_seq || null,
+          sirna_tube_count: form.sirna_tube_count || null,
+          plasmid_vector_info: form.plasmid_vector_info || null,
+          plasmid_resistance: form.plasmid_resistance || null,
+          plasmid_is_mutant: form.plasmid_is_mutant || null,
+          plasmid_mutation_info: form.plasmid_mutation_info || null,
+        }
+        const res = await fetch('/api/reagents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       }
-      const res = await fetch('/api/reagents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       onSuccess()
       onClose()
     } catch (e) {
@@ -109,7 +163,7 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
     <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50">
       <div className="bg-white w-full sm:max-w-lg sm:rounded-xl rounded-t-2xl shadow-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-5 py-4 border-b border-blue-100">
-          <h2 className="text-base font-bold text-blue-800">添加试剂</h2>
+          <h2 className="text-base font-bold text-blue-800">{mode === 'edit' ? '编辑试剂' : '添加试剂'}</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl">×</button>
         </div>
         <form onSubmit={handleSubmit} className="overflow-y-auto px-5 py-4 space-y-3 flex-1">
@@ -118,21 +172,25 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
             <div className="flex gap-2 flex-wrap">
               {CATEGORIES.map((cat) => (
                 <button type="button" key={cat}
-                  onClick={() => setForm((f) => ({
-                    ...EMPTY_FORM,
-                    name: f.name,
-                    storage_location: f.storage_location,
-                    added_by: f.added_by,
-                    added_date: f.added_date,
-                    image_url: f.image_url,
-                    cloudinary_public_id: f.cloudinary_public_id,
-                    category: cat,
-                  }))}
+                  disabled={mode === 'edit'}
+                  onClick={() => {
+                    if (mode === 'edit') return
+                    setForm((f) => ({
+                      ...EMPTY_FORM,
+                      name: f.name,
+                      storage_location: f.storage_location,
+                      added_by: f.added_by,
+                      added_date: f.added_date,
+                      image_url: f.image_url,
+                      cloudinary_public_id: f.cloudinary_public_id,
+                      category: cat,
+                    }))
+                  }}
                   className={`px-3 py-1 rounded-full text-sm font-semibold border transition-colors ${
                     form.category === cat
                       ? 'bg-blue-700 text-white border-blue-700'
                       : 'border-blue-200 text-blue-700 hover:bg-blue-50'
-                  }`}>
+                  } ${mode === 'edit' ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   {cat}
                 </button>
               ))}
@@ -198,17 +256,43 @@ export function AddReagentModal({ onClose, onSuccess }: Props) {
           {field('入库日期', 'added_date', 'date')}
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">实物照片（可选）</label>
-            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
-              capture="environment" onChange={handleImageChange} className="hidden" />
-            <button type="button" onClick={() => fileRef.current?.click()}
-              className="w-full border-2 border-dashed border-blue-200 rounded-lg py-3 text-sm text-blue-500 hover:bg-blue-50">
-              {uploading ? '上传中...' : form.image_url ? '✓ 图片已上传（点击更换）' : '点击上传或拍照'}
-            </button>
+            {mode === 'edit' && reagent?.image_url && (
+              <div className="mb-3">
+                <img src={reagent.image_url} alt="当前图片" className="w-32 h-32 object-cover rounded-lg border border-blue-200" />
+                <div className="mt-2 space-y-1">
+                  <label className="flex items-center text-sm">
+                    <input type="radio" name="imageAction" value="keep" checked={imageAction === 'keep'}
+                      onChange={(e) => setImageAction(e.target.value as 'keep')} className="mr-2" />
+                    保留当前图片
+                  </label>
+                  <label className="flex items-center text-sm">
+                    <input type="radio" name="imageAction" value="replace" checked={imageAction === 'replace'}
+                      onChange={(e) => setImageAction(e.target.value as 'replace')} className="mr-2" />
+                    上传新图片
+                  </label>
+                  <label className="flex items-center text-sm">
+                    <input type="radio" name="imageAction" value="delete" checked={imageAction === 'delete'}
+                      onChange={(e) => setImageAction(e.target.value as 'delete')} className="mr-2" />
+                    删除图片
+                  </label>
+                </div>
+              </div>
+            )}
+            {(mode === 'add' || imageAction === 'replace') && (
+              <>
+                <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+                  capture="environment" onChange={handleImageChange} className="hidden" />
+                <button type="button" onClick={() => fileRef.current?.click()}
+                  className="w-full border-2 border-dashed border-blue-200 rounded-lg py-3 text-sm text-blue-500 hover:bg-blue-50">
+                  {uploading ? '上传中...' : form.image_url ? '✓ 图片已上传（点击更换）' : '点击上传或拍照'}
+                </button>
+              </>
+            )}
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button type="submit" disabled={submitting || uploading}
             className="w-full py-3 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-800 disabled:opacity-50 mt-2">
-            {submitting ? '提交中...' : '确认添加'}
+            {submitting ? '提交中...' : mode === 'edit' ? '保存修改' : '确认添加'}
           </button>
         </form>
       </div>

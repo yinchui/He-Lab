@@ -68,6 +68,7 @@ export default function Home() {
       {/* Add Modal */}
       {showAdd && (
         <AddReagentModal
+          mode="add"
           onClose={() => setShowAdd(false)}
           onSuccess={refetch}
         />
