@@ -6,10 +6,11 @@ const STATIC_EXTENSIONS = /\.(ico|png|jpg|jpeg|gif|svg|webp|css|js|woff|woff2|tt
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 放行登录页、认证 API 和静态资源，避免死循环和资源加载失败
+  // 放行登录页、认证 API、健康检查和静态资源，避免死循环和资源加载失败
   if (
     pathname.startsWith('/login') ||
     pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api/health') ||
     STATIC_EXTENSIONS.test(pathname)
   ) {
     return NextResponse.next()
