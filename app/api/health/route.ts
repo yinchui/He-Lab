@@ -5,7 +5,7 @@ export async function GET() {
   try {
     // 执行一个简单的数据库查询来保持 Supabase 活跃
     const supabase = createAdminClient()
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('reagents')
       .select('id')
       .limit(1)
